@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 2.2 - Animation and State Methods Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations for cat character */
+        @keyframes jump {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-50px);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+
+        @keyframes tailWag {
+            0%, 100% {
+                transform: rotateZ(-5deg);
+            }
+            50% {
+                transform: rotateZ(5deg);
+            }
+        }
+
+        @keyframes headTilt {
+            0%, 100% {
+                transform: rotateZ(-10deg);
+            }
+            50% {
+                transform: rotateZ(10deg);
+            }
+        }
+
+        /* Animation classes */
+        .animate-jump {
+            animation: jump 0.6s ease-in-out;
+        }
+
+        .animate-spin-cat {
+            animation: spin 1s linear;
+        }
+
+        .animate-blink {
+            animation: blink 0.4s ease-in-out;
+        }
+
+        .animate-tail-wag {
+            animation: tailWag 0.5s ease-in-out;
+        }
+
+        .animate-head-tilt {
+            animation: headTilt 0.5s ease-in-out;
+        }
+
+        /* Visual state styles */
+        .state-default {
+            filter: brightness(1) saturate(1);
+        }
+
+        .state-happy {
+            filter: brightness(1.1) saturate(1.2);
+            transform: scale(1.05);
+        }
+
+        .state-playful {
+            filter: brightness(1.15) saturate(1.4);
+            transform: scale(1.1);
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Task 2.2 - Animation and State Methods Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Test Cat Character</h2>
+            <div class="flex justify-center mb-6 p-8 bg-gradient-to-br from-purple-100 via-pink-50 to-blue-100 rounded-lg">
+                <img 
+                    id="test-cat" 
+                    class="cat-character"
+                    src="assets/cat.svg" 
+                    alt="Test cat character"
+                    style="width: 200px; height: auto;"
+                >
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                <button onclick="testApplyAnimation('jump')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Test Jump
+                </button>
+                <button onclick="testApplyAnimation('spin')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Test Spin
+                </button>
+                <button onclick="testApplyAnimation('blink')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Test Blink
+                </button>
+                <button onclick="testApplyAnimation('tailWag')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Test Tail Wag
+                </button>
+                <button onclick="testApplyAnimation('headTilt')" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                    Test Head Tilt
+                </button>
+                <button onclick="testRemoveAnimation()" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    Remove Animation
+                </button>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                <button onclick="testSetVisualState('default')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    Default State
+                </button>
+                <button onclick="testSetVisualState('happy')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    Happy State
+                </button>
+                <button onclick="testSetVisualState('playful')" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    Playful State
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Test Results</h2>
+            <div id="test-results"></div>
+            <button onclick="runAllTests()" class="mt-4 px-6 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 font-bold">
+                Run All Tests
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Include the CatCharacter class from script.js
+        class CatCharacter {
+            constructor(containerSelector) {
+                this.element = document.querySelector(containerSelector);
+                this.currentAnimation = null;
+                this.visualState = 'default';
+            }
+
+            render() {
+                console.log('CatCharacter.render() - placeholder');
+            }
+
+            setSize(width, height) {
+                console.log(`CatCharacter.setSize(${width}, ${height}) - placeholder`);
+            }
+
+            getElement() {
+                return this.element;
+            }
+
+            applyAnimation(animationType) {
+                // Map animation type to CSS class name
+                const animationClassMap = {
+                    jump: 'animate-jump',
+                    spin: 'animate-spin-cat',
+                    blink: 'animate-blink',
+                    tailWag: 'animate-tail-wag',
+                    headTilt: 'animate-head-tilt'
+                };
+
+                const animationClass = animationClassMap[animationType];
+                if (!animationClass) {
+                    console.warn(`Unknown animation type: ${animationType}`);
+                    return;
+                }
+
+                // Add the animation class to the element
+                if (this.element) {
+                    this.element.classList.add(animationClass);
+                    this.currentAnimation = animationType;
+                }
+            }
+
+            removeAnimation() {
+                // Remove all animation classes from the element
+                if (this.element) {
+                    const animationClasses = [
+                        'animate-jump',
+                        'animate-spin-cat',
+                        'animate-blink',
+                        'animate-tail-wag',
+                        'animate-head-tilt'
+                    ];
+
+                    animationClasses.forEach(animClass => {
+                        this.element.classList.remove(animClass);
+                    });
+
+                    this.currentAnimation = null;
+                }
+            }
+
+            setVisualState(state) {
+                // Validate state
+                const validStates = ['default', 'happy', 'playful'];
+                if (!validStates.includes(state)) {
+                    console.warn(`Unknown visual state: ${state}. Valid states are: ${validStates.join(', ')}`);
+                    return;
+                }
+
+                if (!this.element) {
+                    return;
+                }
+
+                // Remove all state classes
+                validStates.forEach(s => {
+                    this.element.classList.remove(`state-${s}`);
+                });
+
+                // Add the new state class
+                this.element.classList.add(`state-${state}`);
+                this.visualState = state;
+            }
+
+            setAriaLabel(label) {
+                if (this.element) {
+                    this.element.setAttribute('aria-label', label);
+                }
+            }
+
+            setTabIndex(index) {
+                if (this.element) {
+                    this.element.setAttribute('tabindex', index);
+                }
+            }
+        }
+
+        // Initialize test cat
+        const testCat = new CatCharacter('#test-cat');
+        testCat.setVisualState('default');
+
+        // Test functions
+        function testApplyAnimation(type) {
+            testCat.applyAnimation(type);
+            addTestResult(`Applied animation: ${type}`, true);
+        }
+
+        function testRemoveAnimation() {
+            testCat.removeAnimation();
+            addTestResult('Removed animation', true);
+        }
+
+        function testSetVisualState(state) {
+            testCat.setVisualState(state);
+            addTestResult(`Set visual state: ${state}`, true);
+        }
+
+        function addTestResult(message, passed) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultElement = document.createElement('div');
+            resultElement.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+            resultElement.textContent = `${passed ? '✓' : '✗'} ${message}`;
+            resultsDiv.appendChild(resultElement);
+        }
+
+        function runAllTests() {
+            document.getElementById('test-results').innerHTML = '';
+            
+            // Test applyAnimation
+            const animationTypes = ['jump', 'spin', 'blink', 'tailWag', 'headTilt'];
+            animationTypes.forEach(type => {
+                testCat.applyAnimation(type);
+                const hasClass = testCat.element.classList.contains(
+                    type === 'jump' ? 'animate-jump' :
+                    type === 'spin' ? 'animate-spin-cat' :
+                    type === 'blink' ? 'animate-blink' :
+                    type === 'tailWag' ? 'animate-tail-wag' :
+                    'animate-head-tilt'
+                );
+                addTestResult(`applyAnimation('${type}') adds correct class`, hasClass);
+                testCat.removeAnimation();
+            });
+
+            // Test removeAnimation
+            testCat.applyAnimation('jump');
+            testCat.removeAnimation();
+            const animationRemoved = !testCat.element.classList.contains('animate-jump') && testCat.currentAnimation === null;
+            addTestResult('removeAnimation() removes all animation classes', animationRemoved);
+
+            // Test setVisualState
+            const states = ['default', 'happy', 'playful'];
+            states.forEach(state => {
+                testCat.setVisualState(state);
+                const hasStateClass = testCat.element.classList.contains(`state-${state}`);
+                const visualStateUpdated = testCat.visualState === state;
+                addTestResult(`setVisualState('${state}') sets correct state`, hasStateClass && visualStateUpdated);
+            });
+
+            // Test state transitions
+            testCat.setVisualState('default');
+            testCat.setVisualState('happy');
+            const defaultRemoved = !testCat.element.classList.contains('state-default');
+            const happyAdded = testCat.element.classList.contains('state-happy');
+            addTestResult('setVisualState() removes previous state', defaultRemoved && happyAdded);
+
+            // Test invalid animation type
+            const consoleSpy = console.warn;
+            let warnCalled = false;
+            console.warn = () => { warnCalled = true; };
+            testCat.applyAnimation('invalidType');
+            console.warn = consoleSpy;
+            addTestResult('applyAnimation() warns on invalid type', warnCalled);
+
+            // Test invalid state
+            warnCalled = false;
+            console.warn = () => { warnCalled = true; };
+            testCat.setVisualState('invalidState');
+            console.warn = consoleSpy;
+            addTestResult('setVisualState() warns on invalid state', warnCalled);
+        }
+    </script>
+</body>
+</html>

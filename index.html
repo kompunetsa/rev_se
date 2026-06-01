@@ -95,6 +95,21 @@
             }
         }
 
+        /* Visual state styles */
+        .state-default {
+            filter: brightness(1) saturate(1);
+        }
+
+        .state-happy {
+            filter: brightness(1.1) saturate(1.2);
+            transform: scale(1.05);
+        }
+
+        .state-playful {
+            filter: brightness(1.15) saturate(1.4);
+            transform: scale(1.1);
+        }
+
         /* Ensure cat stays within viewport */
         .cat-container {
             overflow: hidden;

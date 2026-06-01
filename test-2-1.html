@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 2.1 - CatCharacter Class Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .cat-display {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            background: #f9f9f9;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Task 2.1 - CatCharacter Class Test</h1>
+        
+        <h2>Cat Display</h2>
+        <div id="cat-container" class="cat-display">
+            <img id="cat-character" src="assets/cat.svg" alt="Test cat">
+        </div>
+
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script>
+        // CatCharacter class from script.js
+        class CatCharacter {
+            constructor(containerSelector) {
+                this.containerSelector = containerSelector;
+                this.element = document.querySelector(containerSelector);
+                this.currentAnimation = null;
+                this.visualState = 'default';
+                this.currentWidth = null;
+                this.currentHeight = null;
+            }
+
+            render() {
+                if (!this.element) {
+                    console.error(`CatCharacter: Element not found for selector "${this.containerSelector}"`);
+                    return;
+                }
+
+                this.element.style.display = 'block';
+                this.element.style.margin = '0 auto';
+                
+                this.setSize();
+                
+                console.log('CatCharacter rendered successfully');
+            }
+
+            setSize(percentOfViewport = 30) {
+                if (!this.element) {
+                    console.error('CatCharacter: Cannot set size - element not found');
+                    return;
+                }
+
+                const clampedPercent = Math.max(20, Math.min(40, percentOfViewport));
+                
+                const viewportWidth = window.innerWidth;
+                const catWidth = (clampedPercent / 100) * viewportWidth;
+                
+                this.element.style.width = `${catWidth}px`;
+                this.element.style.height = 'auto';
+                this.element.style.maxWidth = '100%';
+                
+                this.currentWidth = catWidth;
+                this.currentHeight = this.element.offsetHeight;
+                
+                console.log(`CatCharacter size set to ${clampedPercent}% of viewport (${catWidth}px)`);
+            }
+
+            getElement() {
+                return this.element;
+            }
+        }
+
+        // Test functions
+        function addTestResult(message, passed) {
+            const resultsDiv = document.getElementById('test-results');
+            const resultElement = document.createElement('div');
+            resultElement.className = `test-result ${passed ? 'test-pass' : 'test-fail'}`;
+            resultElement.textContent = `${passed ? '✓ PASS' : '✗ FAIL'}: ${message}`;
+            resultsDiv.appendChild(resultElement);
+        }
+
+        function runTests() {
+            // Test 1: Constructor accepts container selector
+            try {
+                const cat = new CatCharacter('#cat-character');
+                addTestResult('Constructor accepts container selector', cat.containerSelector === '#cat-character');
+            } catch (e) {
+                addTestResult('Constructor accepts container selector', false);
+            }
+
+            // Test 2: Constructor finds element
+            try {
+                const cat = new CatCharacter('#cat-character');
+                addTestResult('Constructor finds DOM element', cat.element !== null && cat.element.id === 'cat-character');
+            } catch (e) {
+                addTestResult('Constructor finds DOM element', false);
+            }
+
+            // Test 3: render() method exists and works
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.render();
+                addTestResult('render() method displays cat image', cat.element.style.display === 'block');
+            } catch (e) {
+                addTestResult('render() method displays cat image', false);
+            }
+
+            // Test 4: setSize() scales cat between 20-40% of viewport width
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.setSize(30);
+                const expectedWidth = (30 / 100) * window.innerWidth;
+                const actualWidth = parseFloat(cat.element.style.width);
+                const isCorrectSize = Math.abs(actualWidth - expectedWidth) < 1;
+                addTestResult('setSize() scales cat to 30% of viewport width', isCorrectSize);
+            } catch (e) {
+                addTestResult('setSize() scales cat to 30% of viewport width', false);
+            }
+
+            // Test 5: setSize() clamps to minimum 20%
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.setSize(10);
+                const expectedWidth = (20 / 100) * window.innerWidth;
+                const actualWidth = parseFloat(cat.element.style.width);
+                const isCorrectSize = Math.abs(actualWidth - expectedWidth) < 1;
+                addTestResult('setSize() clamps to minimum 20%', isCorrectSize);
+            } catch (e) {
+                addTestResult('setSize() clamps to minimum 20%', false);
+            }
+
+            // Test 6: setSize() clamps to maximum 40%
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.setSize(50);
+                const expectedWidth = (40 / 100) * window.innerWidth;
+                const actualWidth = parseFloat(cat.element.style.width);
+                const isCorrectSize = Math.abs(actualWidth - expectedWidth) < 1;
+                addTestResult('setSize() clamps to maximum 40%', isCorrectSize);
+            } catch (e) {
+                addTestResult('setSize() clamps to maximum 40%', false);
+            }
+
+            // Test 7: getElement() returns DOM reference
+            try {
+                const cat = new CatCharacter('#cat-character');
+                const element = cat.getElement();
+                addTestResult('getElement() returns DOM reference', element === cat.element && element.id === 'cat-character');
+            } catch (e) {
+                addTestResult('getElement() returns DOM reference', false);
+            }
+
+            // Test 8: render() centers cat image
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.render();
+                addTestResult('render() centers cat image', cat.element.style.margin === '0 auto');
+            } catch (e) {
+                addTestResult('render() centers cat image', false);
+            }
+
+            // Test 9: setSize() stores current dimensions
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.setSize(30);
+                addTestResult('setSize() stores current width', cat.currentWidth !== null && cat.currentWidth > 0);
+            } catch (e) {
+                addTestResult('setSize() stores current width', false);
+            }
+
+            // Test 10: Multiple setSize() calls work correctly
+            try {
+                const cat = new CatCharacter('#cat-character');
+                cat.setSize(25);
+                const width1 = parseFloat(cat.element.style.width);
+                cat.setSize(35);
+                const width2 = parseFloat(cat.element.style.width);
+                addTestResult('Multiple setSize() calls work correctly', width2 > width1);
+            } catch (e) {
+                addTestResult('Multiple setSize() calls work correctly', false);
+            }
+        }
+
+        // Run tests when page loads
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>
