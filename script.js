@@ -16,51 +16,169 @@
  */
 class CatCharacter {
     constructor(containerSelector) {
+        this.containerSelector = containerSelector;
         this.element = document.querySelector(containerSelector);
         this.currentAnimation = null;
         this.visualState = 'default';
+        this.currentWidth = null;
+        this.currentHeight = null;
     }
 
+    /**
+     * Render the cat character in the center of the viewport
+     * Ensures the cat is displayed and properly positioned
+     */
     render() {
-        // Placeholder: will be implemented in task 2.1
-        console.log('CatCharacter.render() - placeholder');
+        if (!this.element) {
+            console.error(`CatCharacter: Element not found for selector "${this.containerSelector}"`);
+            return;
+        }
+
+        // Ensure element is visible and properly positioned
+        this.element.style.display = 'block';
+        this.element.style.margin = '0 auto';
+        
+        // Set initial size (20-40% of viewport width, default to 30%)
+        this.setSize();
+        
+        console.log('CatCharacter rendered successfully');
     }
 
-    setSize(width, height) {
-        // Placeholder: will be implemented in task 2.1
-        console.log(`CatCharacter.setSize(${width}, ${height}) - placeholder`);
+    /**
+     * Set the size of the cat character
+     * Scales the cat between 20-40% of viewport width
+     * @param {number} percentOfViewport - Optional percentage of viewport width (20-40)
+     */
+    setSize(percentOfViewport = 30) {
+        if (!this.element) {
+            console.error('CatCharacter: Cannot set size - element not found');
+            return;
+        }
+
+        // Clamp percentage to 20-40% range
+        const clampedPercent = Math.max(20, Math.min(40, percentOfViewport));
+        
+        // Calculate size based on viewport width
+        const viewportWidth = window.innerWidth;
+        const catWidth = (clampedPercent / 100) * viewportWidth;
+        
+        // Apply size to element
+        this.element.style.width = `${catWidth}px`;
+        this.element.style.height = 'auto'; // Maintain aspect ratio
+        this.element.style.maxWidth = '100%';
+        
+        // Store current dimensions
+        this.currentWidth = catWidth;
+        this.currentHeight = this.element.offsetHeight;
+        
+        console.log(`CatCharacter size set to ${clampedPercent}% of viewport (${catWidth}px)`);
     }
 
+    /**
+     * Get the DOM element reference for the cat character
+     * @returns {HTMLElement} The cat character DOM element
+     */
     getElement() {
         return this.element;
     }
 
     applyAnimation(animationType) {
-        // Placeholder: will be implemented in task 2.2
-        console.log(`CatCharacter.applyAnimation(${animationType}) - placeholder`);
+        // Map animation type to CSS class name
+        const animationClassMap = {
+            jump: 'animate-jump',
+            spin: 'animate-spin-cat',
+            blink: 'animate-blink',
+            tailWag: 'animate-tail-wag',
+            headTilt: 'animate-head-tilt'
+        };
+
+        const animationClass = animationClassMap[animationType];
+        if (!animationClass) {
+            console.warn(`Unknown animation type: ${animationType}`);
+            return;
+        }
+
+        // Add the animation class to the element
+        if (this.element) {
+            this.element.classList.add(animationClass);
+            this.currentAnimation = animationType;
+        }
     }
 
     removeAnimation() {
-        // Placeholder: will be implemented in task 2.2
-        console.log('CatCharacter.removeAnimation() - placeholder');
+        // Remove all animation classes from the element
+        if (this.element) {
+            const animationClasses = [
+                'animate-jump',
+                'animate-spin-cat',
+                'animate-blink',
+                'animate-tail-wag',
+                'animate-head-tilt'
+            ];
+
+            animationClasses.forEach(animClass => {
+                this.element.classList.remove(animClass);
+            });
+
+            this.currentAnimation = null;
+        }
     }
 
     setVisualState(state) {
-        // Placeholder: will be implemented in task 2.2
-        console.log(`CatCharacter.setVisualState(${state}) - placeholder`);
+        // Validate state
+        const validStates = ['default', 'happy', 'playful'];
+        if (!validStates.includes(state)) {
+            console.warn(`Unknown visual state: ${state}. Valid states are: ${validStates.join(', ')}`);
+            return;
+        }
+
+        if (!this.element) {
+            return;
+        }
+
+        // Remove all state classes
+        validStates.forEach(s => {
+            this.element.classList.remove(`state-${s}`);
+        });
+
+        // Add the new state class
+        this.element.classList.add(`state-${state}`);
+        this.visualState = state;
     }
 
     setAriaLabel(label) {
-        // Placeholder: will be implemented in task 2.3
+        /**
+         * Sets the ARIA label for the cat character element
+         * This provides descriptive text for screen readers
+         * 
+         * @param {string} label - The descriptive label for the cat character
+         */
         if (this.element) {
             this.element.setAttribute('aria-label', label);
         }
     }
 
     setTabIndex(index) {
-        // Placeholder: will be implemented in task 2.3
+        /**
+         * Sets the tab index for the cat character element
+         * This makes the cat focusable via keyboard navigation
+         * 
+         * @param {number} index - The tab index value (0 for focusable, -1 for not focusable)
+         */
         if (this.element) {
             this.element.setAttribute('tabindex', index);
+        }
+    }
+
+    setAltText(altText) {
+        /**
+         * Sets the alt text for the cat character image
+         * This provides descriptive text for screen readers and when image fails to load
+         * 
+         * @param {string} altText - The descriptive alt text for the cat image
+         */
+        if (this.element) {
+            this.element.setAttribute('alt', altText);
         }
     }
 }
